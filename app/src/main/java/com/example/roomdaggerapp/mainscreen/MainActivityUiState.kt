@@ -1,4 +1,4 @@
-package com.example.roomdaggerapp
+package com.example.roomdaggerapp.mainscreen
 
 data class MainActivityUiState(
     val word: String = "",

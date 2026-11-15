@@ -1,10 +1,11 @@
-package com.example.roomdaggerapp
+package com.example.roomdaggerapp.mainscreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.database.domain.model.WordItem
-import com.example.database.domain.repository.IDictionaryRepository
+import com.example.roomdaggerapp.repo.MainActivityRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -13,8 +14,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel(
-    private val repository: IDictionaryRepository
-): ViewModel() {
+    private val repository: MainActivityRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(MainActivityUiState())
     val uiState: StateFlow<MainActivityUiState> = _uiState
 
@@ -27,6 +28,20 @@ class MainActivityViewModel(
 
     fun onWordChange(value: String) {
         _uiState.update { it.copy(word = value) }
+    }
+
+    fun onWordFocusEnded() {
+        val currentWord = _uiState.value.word.trim()
+        if (currentWord.isBlank()) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val sentence = repository.searchSentence(currentWord)
+                _uiState.update {
+                    it.copy(example = sentence)
+                }
+            } catch (e: Exception) { }
+        }
     }
 
     fun onTranslationChange(value: String) {
@@ -51,7 +66,7 @@ class MainActivityViewModel(
             example = state.example.trim()
         )
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.addWord(wordItem)
 
             _uiState.update {
@@ -61,14 +76,14 @@ class MainActivityViewModel(
     }
 
     fun deleteWord(wordItem: WordItem) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.deleteWord(wordItem)
         }
     }
 }
 
 class MainActivityViewModelFactory(
-    private val repository: IDictionaryRepository
+    private val repository: MainActivityRepository
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(

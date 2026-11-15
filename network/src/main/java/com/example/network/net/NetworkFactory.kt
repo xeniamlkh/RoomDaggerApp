@@ -9,7 +9,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 internal object NetworkFactory {
 
-    private const val TATOEBA_BASE_URL = "https://api.tatoeba.org/"
+    private const val TATOEBA_URL = "https://api.tatoeba.org/"
 
     private val json = Json {
         ignoreUnknownKeys = true
@@ -17,7 +17,7 @@ internal object NetworkFactory {
 
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(TATOEBA_BASE_URL)
+            .baseUrl(TATOEBA_URL)
             .addConverterFactory(
                 json.asConverterFactory(
                     "application/json".toMediaType()

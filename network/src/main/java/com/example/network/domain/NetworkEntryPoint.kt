@@ -12,6 +12,6 @@ object NetworkEntryPoint {
             .createTatoebaApi()
             .also { repository = it }
 
-    fun getNetworkRepository(): ITatoebaApi =
+    fun getNetworkApi(): ITatoebaApi =
         repository ?: error("NetworkEntryPoint.init() was not called")
 }
