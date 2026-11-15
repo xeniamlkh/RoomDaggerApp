@@ -1,22 +1,20 @@
 package com.example.roomdaggerapp.di
 
-import com.example.addword.di.AddWordDependencies
-import com.example.database.di.DatabaseComponent
-import com.example.network.di.NetworkComponent
-import com.example.welcome.di.WelcomeDependencies
+import android.content.Context
+import com.example.core.ApplicationContext
+import com.example.database.di.DatabaseModule
+import com.example.network.di.NetworkModule
+import dagger.BindsInstance
 import dagger.Component
+import javax.inject.Singleton
 
-@AppScope
-@Component(
-    dependencies = [DatabaseComponent::class, NetworkComponent::class],
-    modules = [AppModule::class]
-)
-interface AppComponent : WelcomeDependencies, AddWordDependencies {
+@Singleton
+@Component(modules = [AppModule::class, DatabaseModule::class, NetworkModule::class])
+interface AppComponent {
+    fun mainActivityComponentFactory(): MainActivityComponent.Factory
+
     @Component.Factory
     interface Factory {
-        fun create(
-            databaseComponent: DatabaseComponent,
-            networkComponent: NetworkComponent
-        ): AppComponent
+        fun create(@BindsInstance @ApplicationContext context: Context): AppComponent
     }
 }

@@ -4,10 +4,11 @@ import com.example.domain.repository.MainActivityRepository
 import com.example.roomdaggerapp.repo.MainActivityRepositoryImpl
 import dagger.Binds
 import dagger.Module
+import javax.inject.Singleton
 
-@Module
+@Module(subcomponents = [MainActivityComponent::class])
 abstract class AppModule {
     @Binds
-    @AppScope
+    @Singleton
     abstract fun bindMainActivityRepository(impl: MainActivityRepositoryImpl): MainActivityRepository
 }

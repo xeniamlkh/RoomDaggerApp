@@ -13,11 +13,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val appComponent = (application as App).appComponent
+        val activityComponent = (application as App).appComponent
+            .mainActivityComponentFactory()
+            .create(this)
 
         setContent {
             MaterialTheme {
-                AppNavHost(appComponent)
+                AppNavHost(activityComponent)
             }
         }
     }

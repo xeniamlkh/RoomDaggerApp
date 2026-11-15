@@ -20,7 +20,7 @@ fun NavGraphBuilder.addWordScreen(
             DaggerAddWordComponent.factory().create(dependencies)
         }
         val viewModel: AddWordViewModel = viewModel(
-            factory = component.addWordViewModelFactory()
+            factory = component.viewModelFactory()
         )
         AddWordScreen(viewModel = viewModel, onBack = onBack)
     }

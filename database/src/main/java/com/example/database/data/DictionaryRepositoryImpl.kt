@@ -5,11 +5,8 @@ import com.example.database.domain.repository.IDictionaryRepository
 import com.example.domain.model.WordItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-internal class DictionaryRepositoryImpl @Inject constructor(
+internal class DictionaryRepositoryImpl(
     private val dictionaryDao: DictionaryDao
 ) : IDictionaryRepository {
 

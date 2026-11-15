@@ -2,9 +2,8 @@ package com.example.network.data
 
 import com.example.network.domain.repository.ITatoebaApi
 import com.example.network.net.TatoebaService
-import javax.inject.Inject
 
-internal class TatoebaApiImpl @Inject constructor(
+internal class TatoebaApiImpl(
     private val service: TatoebaService
 ) : ITatoebaApi {
     override suspend fun searchSentence(

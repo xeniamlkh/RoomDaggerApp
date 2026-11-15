@@ -1,12 +1,17 @@
 package com.example.addword.di
 
-import com.example.addword.ui.AddWordViewModelFactory
+import androidx.lifecycle.ViewModelProvider
+import com.example.core.FeatureScope
 import dagger.Component
 
-@Component(dependencies = [AddWordDependencies::class])
+@FeatureScope
+@Component(
+    dependencies = [AddWordDependencies::class],
+    modules = [AddWordModule::class]
+)
 interface AddWordComponent {
 
-    fun addWordViewModelFactory(): AddWordViewModelFactory
+    fun viewModelFactory(): ViewModelProvider.Factory
 
     @Component.Factory
     interface Factory {

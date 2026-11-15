@@ -3,6 +3,7 @@ package com.example.welcome.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.core.FeatureScope
 import com.example.domain.model.WordItem
 import com.example.domain.repository.MainActivityRepository
 import javax.inject.Inject
@@ -30,6 +31,7 @@ class WelcomeViewModel (
     }
 }
 
+@FeatureScope
 class WelcomeViewModelFactory @Inject constructor(
     private val repository: MainActivityRepository
 ) : ViewModelProvider.Factory {

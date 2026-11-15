@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":feature:welcome"))
     implementation(project(":feature:addword"))
+    implementation(project(":core"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)

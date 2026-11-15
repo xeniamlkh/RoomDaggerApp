@@ -1,15 +1,17 @@
 package com.example.welcome.di
 
+import com.example.core.FeatureScope
 import com.example.welcome.ui.WelcomeViewModelFactory
-import dagger.Component
+import dagger.Subcomponent
 
-@Component(dependencies = [WelcomeDependencies::class])
+@FeatureScope
+@Subcomponent
 interface WelcomeComponent {
 
     fun welcomeViewModelFactory(): WelcomeViewModelFactory
 
-    @Component.Factory
+    @Subcomponent.Factory
     interface Factory {
-        fun create(dependencies: WelcomeDependencies): WelcomeComponent
+        fun create(): WelcomeComponent
     }
 }
