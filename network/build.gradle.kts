@@ -28,6 +28,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
     implementation(libs.retrofit)
+    implementation(libs.retrofit.converter)
     implementation(libs.kotlinx.serialization)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
