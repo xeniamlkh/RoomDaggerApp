@@ -26,3 +26,7 @@ rootProject.name = "RoomDaggerApp"
 include(":app")
 include(":database")
 include(":network")
+include(":feature:welcome")
+include(":feature:addword")
+include(":domain")
+//include(":core")

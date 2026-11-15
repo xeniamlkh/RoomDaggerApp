@@ -41,6 +41,9 @@ android {
 dependencies {
     implementation(project(":database"))
     implementation(project(":network"))
+    implementation(project(":domain"))
+    implementation(project(":feature:welcome"))
+    implementation(project(":feature:addword"))
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -53,6 +56,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

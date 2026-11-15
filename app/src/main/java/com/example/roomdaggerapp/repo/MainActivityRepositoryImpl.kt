@@ -1,11 +1,13 @@
 package com.example.roomdaggerapp.repo
 
-import com.example.database.domain.model.WordItem
+import com.example.domain.model.WordItem
 import com.example.database.domain.repository.IDictionaryRepository
+import com.example.domain.repository.MainActivityRepository
 import com.example.network.domain.repository.ITatoebaApi
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class MainActivityRepositoryImpl(
+class MainActivityRepositoryImpl @Inject constructor(
     private val dictionaryRepository: IDictionaryRepository,
     private val networkApi: ITatoebaApi
 ) : MainActivityRepository {
