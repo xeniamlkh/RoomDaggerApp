@@ -1,0 +1,78 @@
+pipeline {
+    agent { label 'android' }
+
+    triggers { cron('H 2 * * *') }
+
+    options {
+        timeout(time: 180, unit: 'MINUTES')
+        disableConcurrentBuilds()
+    }
+
+    environment {
+        BASELINE_DIR = '/home/jenkins/agent/baseline'
+    }
+
+    stages {
+        stage('Prepare') {
+            steps { sh 'chmod +x gradlew' }
+        }
+
+        // Сборка + замеры
+        stage('Benchmark') {
+            steps {
+                sh '''
+                    gradle-profiler --benchmark \
+                      --scenario-file performance.scenarios \
+                      --project-dir . \
+                      --output-dir profile-out
+                '''
+            }
+        }
+
+        stage('Anomaly check') {
+            steps {
+                sh '''
+                    mkdir -p "$BASELINE_DIR"
+                    python3 - <<'EOF'
+import csv, os, sys
+
+csv_path = 'profile-out/benchmark.csv'
+base_dir = os.environ['BASELINE_DIR']
+THRESHOLD = 1.15   # допустимый рост: 15%
+
+rows = list(csv.reader(open(csv_path, newline='')))
+# Сценарии перечислены в строке "scenario"; строка "mean" содержит средние значения
+scenario_row = next(r for r in rows if r and r[0] == 'scenario')
+mean_row = next(r for r in rows if r and r[0] == 'mean')
+
+failed = False
+for name, value in zip(scenario_row[1:], mean_row[1:]):
+    if not name or not value:
+        continue
+    mean = float(value)
+    base_file = os.path.join(base_dir, name + '.txt')
+    print(f'{name}: среднее {mean:.0f} мс')
+    if os.path.exists(base_file):
+        base = float(open(base_file).read())
+        ratio = mean / base
+        print(f'  база {base:.0f} мс, изменение {100 * (ratio - 1):+.1f}%')
+        if ratio > THRESHOLD:
+            print('  АНОМАЛИЯ: медленнее базы больше чем на 15%')
+            failed = True
+            continue   # базу при аномалии не обновляем
+    open(base_file, 'w').write(str(mean))
+
+sys.exit(1 if failed else 0)
+EOF
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'profile-out/**', allowEmptyArchive: true
+        }
+        cleanup { cleanWs() }
+    }
+}
