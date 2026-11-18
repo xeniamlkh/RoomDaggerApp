@@ -33,41 +33,40 @@ pipeline {
             steps {
                 sh '''
                     mkdir -p "$BASELINE_DIR"
-                    python3 - <<'EOF'
-import csv, os, sys
+                    FAILED=0
 
-csv_path = 'profile-out/benchmark.csv'
-base_dir = os.environ['BASELINE_DIR']
-THRESHOLD = 1.15   # допустимый рост: 15%
+                    # Считаем среднее по строкам "measured build" для каждого сценария
+                    awk -F, '
+                      $1=="scenario" { for (i=2;i<=NF;i++) name[i]=$i; n=NF }
+                      $1 ~ /^measured build/ { for (i=2;i<=NF;i++) { sum[i]+=$i; cnt[i]++ } }
+                      END { for (i=2;i<=n;i++) if (cnt[i]>0) print name[i], int(sum[i]/cnt[i]+0.5) }
+                    ' profile-out/benchmark.csv > profile-out/means.txt
 
-rows = list(csv.reader(open(csv_path, newline='')))
-# Сценарии перечислены в строке "scenario"; строка "mean" содержит средние значения
-scenario_row = next(r for r in rows if r and r[0] == 'scenario')
-mean_row = next(r for r in rows if r and r[0] == 'mean')
+                    # Если средних нет, формат CSV изменился: падаем
+                    [ -s profile-out/means.txt ] || { echo "Не удалось посчитать средние из benchmark.csv"; exit 1; }
 
-failed = False
-for name, value in zip(scenario_row[1:], mean_row[1:]):
-    if not name or not value:
-        continue
-    mean = float(value)
-    base_file = os.path.join(base_dir, name + '.txt')
-    print(f'{name}: среднее {mean:.0f} мс')
-    if os.path.exists(base_file):
-        base = float(open(base_file).read())
-        ratio = mean / base
-        print(f'  база {base:.0f} мс, изменение {100 * (ratio - 1):+.1f}%')
-        if ratio > THRESHOLD:
-            print('  АНОМАЛИЯ: медленнее базы больше чем на 15%')
-            failed = True
-            continue   # базу при аномалии не обновляем
-    open(base_file, 'w').write(str(mean))
+                    while read NAME MEAN; do
+                        echo "$NAME: среднее $MEAN мс"
+                        BASE_FILE="$BASELINE_DIR/$NAME.txt"
 
-sys.exit(1 if failed else 0)
-EOF
+                        if [ -f "$BASE_FILE" ]; then
+                            BASE=$(cat "$BASE_FILE")
+                            CHANGE=$(awk -v m="$MEAN" -v b="$BASE" 'BEGIN { printf "%.1f", (m/b - 1) * 100 }')
+                            echo "  база $BASE мс, изменение $CHANGE%"
+                            # Порог 1.15 = +15%
+                            if awk -v m="$MEAN" -v b="$BASE" 'BEGIN { exit !(m/b > 1.15) }'; then
+                                echo "  АНОМАЛИЯ: медленнее базы больше чем на 15%"
+                                FAILED=1
+                                continue
+                            fi
+                        fi
+                        echo "$MEAN" > "$BASE_FILE"
+                    done < profile-out/means.txt
+
+                    exit $FAILED
                 '''
             }
         }
-    }
 
     post {
         always {
