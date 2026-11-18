@@ -1,0 +1,15 @@
+# Сборка с нуля: перед каждым замером выполняется clean
+clean_build {
+    tasks = ["assembleDebug"]
+    cleanup-tasks = ["clean"]
+    warm-ups = 2
+    iterations = 5
+}
+
+# Инкрементальная сборка: gradle-profiler сам меняет файл и пересобирает
+incremental_build {
+    tasks = ["assembleDebug"]
+    apply-abi-change-to = "app/src/main/java/com/example/roomdaggerapp/MainActivity.kt"
+    warm-ups = 2
+    iterations = 5
+}
