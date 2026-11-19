@@ -67,6 +67,7 @@ pipeline {
                 '''
             }
         }
+    }
 
     post {
         always {
@@ -74,5 +75,4 @@ pipeline {
         }
         cleanup { cleanWs() }
     }
-  }
 }
